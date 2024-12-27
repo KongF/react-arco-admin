@@ -13,8 +13,10 @@ const userSlice = createSlice({
   initialState: () => {
     // 如果localStorage中有从其中取，否则为null
     const token = getToken() || null
+    const refreshTiken = getRefreshToken() || null
     return {
       token,
+      refreshTiken,
       userinfo: { username: 'Alan' }
     }
   },
@@ -22,7 +24,7 @@ const userSlice = createSlice({
   reducers: {
     setUserinfo(state, action) {
       const { payload } = action
-        state.userinfo = payload
+      state.userinfo = payload
     },
     login(state, action) {
       state.token = action.payload.token

@@ -2,30 +2,6 @@ import { lazy } from 'react'
 import { createSlice } from '@reduxjs/toolkit'
 import  constantRoutes from '@/router'
 import {Navigate} from "react-router-dom";
-const permissionSlice = createSlice({
-    name: 'permission',
-    initialState: {
-        // routers默认为静态路由，之后拼接上服务器返回动态路由
-        routes: constantRoutes,
-        permissionRoutes: []
-    },
-    reducers: {
-        setRoutes(state, action) {
-            state.routes = constantRoutes.map((item) => {
-                // 嵌套在layout路由children下
-                if (item.path === '/') {
-                    return { ...item, children: item.children.concat(action.payload.routes) }
-                }
-                return item
-            })
-        },
-        setPermissionRoutes(state, action) {
-            state.permissionRoutes = action.payload.routes
-        },
-}
-})
-export const { setRoutes, setPermissionRoutes } = permissionSlice.actions
-export default permissionSlice
 
 // 得到后端路由经转换后的路由结构
 function filterAsyncRoutes(routes) {
@@ -57,12 +33,39 @@ function filterAsyncRoutes(routes) {
     })
     return res
 }
+
+const permissionSlice = createSlice({
+    name: 'permission',
+    initialState: {
+        // routers默认为静态路由，之后拼接上服务器返回动态路由
+        routes: constantRoutes,
+        permissionRoutes: []
+    },
+    reducers: {
+        setRoutes(state, action) {
+            state.routes = constantRoutes.map((item) => {
+                // 嵌套在layout路由children下
+                if (item.path === '/') {
+                    return { ...item, children: item.children.concat(action.payload.routes) }
+                }
+                return item
+            })
+        },
+        setPermissionRoutes(state, action) {
+            state.permissionRoutes = action.payload.routes
+        },
+}
+})
+export const { setRoutes, setPermissionRoutes } = permissionSlice.actions
+
 export const generateRoutes = (payload) => (dispatch) => {
     const accessedRoutes = filterAsyncRoutes(payload)
     // 分发全局路由状态（静态 + 动态）
     dispatch(setRoutes({ routes: accessedRoutes }))
     // 分发动态路由
-    dispatch(setPermissionRoutes({ routes: accessedRoutes }))
-    return accessedRoutes
+    dispatch(setPermissionRoutes({ routes: accessedRoutes }));
+    return accessedRoutes;
 }
+
+export default permissionSlice
 
